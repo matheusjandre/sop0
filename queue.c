@@ -7,126 +7,142 @@
 
 int queue_size(queue_t *queue)
 {
-	queue_t *aux = queue;
+	queue_t *temp = queue;
 	int c = 0;
-
-	if (!queue)
-		return 0;
 
 	do
 	{
+		if (!temp) // Se fila vazia, retorna 0
+			break;
+
 		c++;
-		aux = aux->next;
-	} while (aux != queue);
+		temp = temp->next;
+
+	} while (temp != queue); // Enquanto não volta para a cabeça
 
 	return c;
 }
 
 void queue_print(char *name, queue_t *queue, void print_elem(void *))
 {
-	printf("Hello world.");
+	queue_t *temp = queue;
+
+	printf("%s: [", name);
+
+	do
+	{
+		if (!queue) // Se fila vazia, não imprime nada entre os colchetes
+			break;
+
+		print_elem(temp); // Chama a funcão de impressão para o elemento
+		temp = temp->next;
+
+		if (temp != queue)
+			printf(" ");
+
+	} while (temp != queue); // Enquanto não volta para a cabeça
+
+	printf("]\n");
 }
 
 int queue_append(queue_t **queue, queue_t *elem)
 {
-	queue_t *aux;
+	queue_t *temp;
 
 	if (!queue)
 	{
-		perror("A fila não existe.");
+		perror("Fila inexistente.");
 		return -1;
 	}
 
 	if (!elem)
 	{
-		perror("O elemento não existe.");
-		return -1;
+		perror("Elemento inexistente.");
+		return -2;
 	}
 
 	if (elem->next != NULL || elem->prev != NULL)
 	{
-		perror("O elemento está em outra fila.");
-		return -1;
+		perror("O elemento pertence a uma fila.");
+		return -3;
 	}
 
-	if (!(*queue)) // Se fila vazia, adiciona o elemento e aponta para si
+	if (!*queue) // Se fila vazia
 	{
-		*queue = elem;
-		elem->next = elem;
-		elem->prev = elem;
-		return 0;
+		*queue = elem; // Cabeça aponta para o elemento
+
+		elem->next = elem; // NEXT: Novo elemento = novo elemento
+		elem->prev = elem; // PREV: Novo elemento = novo elemento
+
+		return 0; // Elemento inserido com sucesso
 	}
 
-	aux = (*queue)->prev;	 // Ultimo elemento
-	aux->next = elem;			 // Ultimo elemento -> novo elemento
-	elem->prev = aux;			 // Ultimo elemento <- novo elemento
-	elem->next = *queue;	 // Novo elemento -> cabeça
-	(*queue)->prev = elem; // Novo elemento <- cabeça.
+	temp = (*queue)->prev; // Ultimo elemento
 
-	return 0;
+	temp->next = elem;		 // NEXT: Ultimo elemento = novo elemento
+	elem->prev = temp;		 // PREV: Novo elemento = último elemento
+	elem->next = *queue;	 // NEXT: Novo elemento = cabeça
+	(*queue)->prev = elem; // PREV: Cabeça = novo elemento
+
+	return 0; // Elemento inserido com sucesso
 }
 
-//------------------------------------------------------------------------------
-// Remove o elemento indicado da fila, sem o destruir.
-// Condicoes a verificar, gerando msgs de erro:
-// - a fila deve existir
-// - a fila nao deve estar vazia
-// - o elemento deve existir
-// - o elemento deve pertencer a fila indicada
-// Retorno: 0 se sucesso, <0 se ocorreu algum erro
 int queue_remove(queue_t **queue, queue_t *elem)
 {
-	queue_t *aux;
+	queue_t *remove;
 
 	if (!queue)
 	{
-		perror("A fila não existe.");
+		perror("Fila inexistente.");
 		return -1;
 	}
 
 	if (!(*queue))
 	{
 		perror("A fila está vazia.");
-		return -1;
+		return -2;
 	}
 
 	if (!elem)
 	{
-		perror("O elemento não existe.");
-		return -1;
+		perror("Elemento inexistente.");
+		return -3;
 	}
 
-	aux = *queue;
+	remove = *queue; // Inicia a buscando pelo elemento da cabeça
 
 	do
 	{
-		if (aux == elem) // Elemento encontrado
-		{
-			if (aux == *queue) // Se for o primeiro elemento
-			{
-				if (aux->next == *queue) // Se for o único elemento
-				{
-					aux->next = NULL; // Fila vazia
-					aux->prev = NULL; // Fila vazia
-					*queue = NULL;		// Fila vazia
-					return 0;					// Elemento removido
-				}
-				else
-				{
-					*queue = aux->next; // Cabeça aponta para o próximo
-				}
-			}
-			aux->prev->next = aux->next; // Elemento anterior -> próximo
-			aux->next->prev = aux->prev; // Elemento próximo <- anterior
-			aux->next = NULL;						 // Elemento não aponta para nada
-			aux->prev = NULL;						 // Elemento não aponta para nada
-			return 0;										 // Elemento removido
-		}
+		if (remove == elem) // Se o elemento a ser removido for a cabeça
+			break;						// Sai do loop
 
-		aux = aux->next; // Elemento não encontrado. Próximo elemento
+		remove = remove->next; // Próximo elemento
 
-	} while (aux != *queue); // Se voltar para a cabeça, termina a busca
+	} while (remove != *queue && remove != elem); // Enquanto não volta para a cabeça ou encontra o elemento
 
-	perror("O elemento não pertence a fila.");
-	return -1;
+	if (remove != elem) // Se não encontrou o elemento
+	{
+		perror("O elemento não foi encontrado na fila.");
+		return -4;
+	}
+
+	if (remove->next == remove && remove->prev == remove) // Se for o único elemento da fila
+	{
+		remove->next = NULL; // Limpa o ponteiro para o próximo
+		remove->prev = NULL; // Limpa o ponteiro para o anterior
+		*queue = NULL;			 // Fila vazia
+		return 0;						 // Elemento removido com sucesso
+	}
+
+	if (remove == *queue) // Se for o primeiro elemento mas não o único
+	{
+		*queue = remove->next; // Cabeça aponta para o próximo
+	}
+
+	remove->prev->next = remove->next; // NEXT: Elemento anterior = próximo do elemento a ser removido
+	remove->next->prev = remove->prev; // PREV: Próximo elemento = anterior do elemento a ser removido
+	remove->next = NULL;							 // Limpa o ponteiro para o próximo
+	remove->prev = NULL;							 // Limpa o ponteiro para o anterior
+
+	return 0;
 }

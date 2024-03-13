@@ -5,7 +5,7 @@ COMP = gcc
 CFLAGS = -Wall -std=c99
 
 PROGRAM = queue
-MAIN = testafila.c
+MAIN = backup.c
 
 DEP = queue.o
 
