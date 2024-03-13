@@ -12,7 +12,7 @@ int queue_size(queue_t *queue)
 
    do
    {
-      if (!temp) // Se fila vazia, retorna 0
+      if (!temp) // Se fila vazia sai do loop sem incrementar
          break;
 
       c++;

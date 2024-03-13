@@ -15,7 +15,7 @@
 #include <assert.h>
 #include "queue.h"
 
-#define N 100
+#define N 3
 
 // A estrutura "filaint_t" será usada com as funções de queue.c usando um
 // casting para o tipo "queue_t". Isso funciona bem, se os campos iniciais
@@ -244,6 +244,10 @@ int main(int argc, char **argv, char **envp)
    queue_append((queue_t **)&fila0, (queue_t *)&item[0]);
    queue_append((queue_t **)&fila1, (queue_t *)&item[1]);
 
+   printf("fila0: %p | fila1: %p\n", fila0, fila1);
+   printf("fila0: %p | elem0: %p\n", fila0, &item[0]);
+   printf("fila1: %p | elem1: %p\n", fila1, &item[1]);
+
    // tentar remover elemento que está em outra fila
    printf("Testando remocao de elemento que está em outra fila...\n");
    queue_remove((queue_t **)&fila0, (queue_t *)&item[1]);
@@ -328,7 +332,7 @@ int main(int argc, char **argv, char **envp)
    queue_print("Saida gerada  ", (queue_t *)fila0, print_elem);
 
    // uma fila com 10 elementos
-   for (i = 0; i < 10; i++)
+   for (i = 0; i < N; i++)
       queue_append((queue_t **)&fila0, (queue_t *)&item[i]);
 
    // imprimir a fila
