@@ -1,6 +1,4 @@
-// PingPongOS - PingPong Operating System
-// Matheus Henrique Jandre Ferraz - Bacharelado Ciência da Computação
-// GRR: 20215397
+// GRR20215397 Matheus Henrique Jandre Ferraz
 
 #include <stdio.h>
 #include "queue.h"
